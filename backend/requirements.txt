@@ -1,0 +1,29 @@
+# FastAPI and server
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+python-multipart==0.0.6
+
+# Database
+motor==3.3.2
+pymongo==4.6.1
+
+# Authentication
+pyjwt==2.8.0
+python-dotenv==1.0.0
+passlib==1.7.4
+bcrypt==3.2.0
+
+# Validation
+pydantic==2.5.3
+pydantic-settings==2.1.0
+email-validator==2.1.0.post1
+
+# Utilities
+phonenumbers==8.13.27
+httpx==0.26.0
+
+# CORS
+starlette==0.35.1
+
+# Security
+slowapi==0.1.9
