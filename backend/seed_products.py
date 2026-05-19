@@ -1,7 +1,12 @@
 import asyncio
+import os
 from motor.motor_asyncio import AsyncIOMotorClient
+from dotenv import load_dotenv
 
-MONGODB_URL = "mongodb+srv://charitarth:a4Zfbo3ZoyRK89O8@cluster0.ziyg8rc.mongodb.net/grocery_db?retryWrites=true&w=majority"
+# Load environment variables from .env file
+load_dotenv()
+
+MONGODB_URL = os.getenv("MONGODB_URL", "mongodb://localhost:27017/grocery_db")
 DATABASE_NAME = "grocery_db"
 
 async def seed_products():
