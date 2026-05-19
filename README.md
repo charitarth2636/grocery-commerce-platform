@@ -43,19 +43,81 @@
 
 ---
 
-## 📸 Project Visuals
+## 📊 System Architecture & Data Flow
 
 <div align="center">
-  <img src="https://via.placeholder.com/1000x500/F3F4F6/10B981?text=Main+Application+Banner+Placeholder" alt="Project Banner" width="100%" style="border-radius: 12px; margin-bottom: 20px;" />
-  
-  <p align="center">
-    <i>(Replace placeholders with actual UI screenshots)</i>
-  </p>
+
+```mermaid
+graph TD
+    %% Styling
+    classDef frontend fill:#20232a,stroke:#61dafb,stroke-width:2px,color:#fff,rx:8px
+    classDef backend fill:#009688,stroke:#fff,stroke-width:2px,color:#fff,rx:8px
+    classDef database fill:#4EA94B,stroke:#fff,stroke-width:2px,color:#fff,rx:8px
+
+    subgraph "Frontend Layer (React + Zustand)"
+        C[🛒 Customer Interface]:::frontend
+        A[🛡️ Admin Dashboard]:::frontend
+        R[🛵 Delivery Rider Panel]:::frontend
+    end
+
+    subgraph "API Layer (FastAPI)"
+        Gateway{API Router & <br/> Rate Limiter}:::backend
+        Auth[🔐 JWT Auth Service]:::backend
+        BizLogic[⚙️ Core Business Logic]:::backend
+        WS[⚡ WebSocket Manager]:::backend
+    end
+
+    subgraph "Database Layer"
+        DB[(🍃 MongoDB Atlas)]:::database
+    end
+
+    %% Data Flow
+    C <-->|REST API| Gateway
+    A <-->|REST API| Gateway
+    R <-->|REST API| Gateway
+    
+    Gateway --> Auth
+    Gateway --> BizLogic
+    Gateway -.->|Real-time Events| WS
+    
+    BizLogic <-->|Async Queries| DB
+    Auth <-->|Verify Users| DB
+    WS -.->|Order Tracking| C
+    WS -.->|Location Updates| R
+```
+
 </div>
 
-| Customer Storefront | Admin Command Center | Delivery Rider Dashboard |
-| :---: | :---: | :---: |
-| <img src="https://via.placeholder.com/300x200/F9FAFB/111827?text=Storefront+Preview" width="300" /> | <img src="https://via.placeholder.com/300x200/F9FAFB/111827?text=Admin+Dashboard" width="300" /> | <img src="https://via.placeholder.com/300x200/F9FAFB/111827?text=Rider+Panel" width="300" /> |
+### 🔄 End-to-End Order Lifecycle
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Customer
+    participant API (FastAPI)
+    participant Database
+    participant Admin
+    participant Rider
+    
+    Customer->>API (FastAPI): POST /api/orders (Place Order)
+    API (FastAPI)->>Database: Insert Order (Status: Pending)
+    API (FastAPI)-->>Customer: Order Confirmed
+    
+    Admin->>API (FastAPI): GET /api/admin/orders
+    API (FastAPI)-->>Admin: Return New Orders
+    
+    Admin->>API (FastAPI): PUT /api/orders/{id}/assign (To Rider)
+    API (FastAPI)->>Database: Update Status (Assigned)
+    
+    Note over API (FastAPI), Rider: Push Notification / WebSocket Event
+    
+    Rider->>API (FastAPI): PUT /api/orders/{id}/status (Out for Delivery)
+    API (FastAPI)->>Database: Update Status (Out for Delivery)
+    
+    Rider->>API (FastAPI): PUT /api/orders/{id}/status (Delivered)
+    API (FastAPI)->>Database: Update Status (Completed)
+    API (FastAPI)-)Customer: Real-time Update: "Delivered!"
+```
 
 ---
 
